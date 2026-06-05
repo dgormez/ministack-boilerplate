@@ -2,14 +2,14 @@
 
 A production-ready monorepo starter for shipping React Native apps backed by a .NET API. Clone, configure, and ship in a day.
 
-**Stack:** Expo SDK 54 · NativeWind v4 · Zustand · expo-sqlite · ASP.NET Core 9 Minimal API · EF Core · Supabase PostgreSQL · Azure App Service · EAS Build
+**Stack:** Expo SDK 54 · NativeWind v4 · Zustand · expo-sqlite · ASP.NET Core 10 Minimal API · EF Core · Supabase PostgreSQL · Azure App Service · EAS Build
 
 ---
 
 ## What's included
 
 - **Mobile** — Expo managed workflow, TypeScript strict mode, Expo Router file-based navigation, NativeWind v4 for styling, Zustand state management, expo-sqlite local persistence with offline support, incremental sync, JWT auth with auto-refresh, Sentry crash reporting
-- **Backend** — ASP.NET Core 9 Minimal API, EF Core + Supabase PostgreSQL, JWT auth (register / login / refresh / logout / delete account), CRUD endpoints, Swagger with Bearer auth, health check endpoint
+- **Backend** — ASP.NET Core 10 Minimal API, EF Core + Supabase PostgreSQL, JWT auth (register / login / refresh / logout / delete account), CRUD endpoints, Scalar API UI with Bearer auth, health check endpoint
 - **CI/CD** — GitHub Actions for Azure backend deploy + EAS production builds
 - **Demo app** — a working Notes app that proves end-to-end connectivity
 
@@ -18,7 +18,7 @@ A production-ready monorepo starter for shipping React Native apps backed by a .
 ## Prerequisites
 
 - Node 20+ and npm
-- .NET 9 SDK
+- .NET 10 SDK
 - Expo CLI: `npm install -g expo-cli`
 - EAS CLI: `npm install -g eas-cli`
 - A [Supabase](https://supabase.com) project (free tier works)
@@ -58,7 +58,7 @@ Run locally:
 ```bash
 cd backend/MiniStack.Api
 dotnet run
-# Swagger UI: http://localhost:5000/swagger
+# Scalar API UI: http://localhost:5000/scalar/v1
 ```
 
 EF Core will auto-migrate on first run in Development.
@@ -93,7 +93,7 @@ npx expo start
 
 ### 4. Deploy the backend to Azure
 
-1. Create an Azure App Service (Linux, .NET 9)
+1. Create an Azure App Service (Linux, .NET 10)
 2. Add your GitHub secrets:
    - `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` — from a service principal with Contributor access
    - `AZURE_APP_NAME` — your App Service name

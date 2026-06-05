@@ -1,8 +1,10 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
+using Scalar.AspNetCore;
 using MiniStack.Api.Data;
 using MiniStack.Api.Endpoints;
 using MiniStack.Api.Services;
@@ -48,29 +50,35 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader());
 });
 
-// ── Swagger ───────────────────────────────────────────────────────────────────
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+// ── OpenAPI / Scalar ──────────────────────────────────────────────────────────
+builder.Services.AddOpenApi(options =>
 {
-    c.SwaggerDoc("v1", new() { Title = "MiniStack API", Version = "v1" });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    options.AddDocumentTransformer((document, context, ct) =>
     {
-        Name        = "Authorization",
-        Type        = SecuritySchemeType.Http,
-        Scheme      = "Bearer",
-        BearerFormat = "JWT",
-        In          = ParameterLocation.Header,
-        Description = "Enter your JWT access token.",
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+        document.Info ??= new();
+        document.Info.Title = "MiniStack API";
+        document.Components ??= new OpenApiComponents();
+        document.Components.SecuritySchemes!["Bearer"] = new OpenApiSecurityScheme
         {
-            new OpenApiSecurityScheme
+            Name        = "Authorization",
+            Type        = SecuritySchemeType.Http,
+            Scheme      = "bearer",
+            BearerFormat = "JWT",
+            In          = ParameterLocation.Header,
+            Description = "Enter your JWT access token.",
+        };
+        return Task.CompletedTask;
+    });
+    options.AddOperationTransformer((operation, context, ct) =>
+    {
+        if (context.Description.ActionDescriptor.EndpointMetadata.OfType<IAuthorizeData>().Any())
+        {
+            operation.Security = [new OpenApiSecurityRequirement
             {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-            },
-            Array.Empty<string>()
+                [new OpenApiSecuritySchemeReference("Bearer")] = []
+            }];
         }
+        return Task.CompletedTask;
     });
 });
 
@@ -92,8 +100,8 @@ app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.MapScalarApiReference();  // UI at /scalar/v1
 }
 
 // ── Health check ──────────────────────────────────────────────────────────────
