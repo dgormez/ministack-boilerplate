@@ -15,6 +15,40 @@ A production-ready monorepo starter for shipping React Native apps backed by a .
 
 ---
 
+## 5-minute quick start
+
+> **Before you start:** work through [SETUP_CHECKLIST.md](./SETUP_CHECKLIST.md) to fill in every placeholder. Steps below assume that's done.
+
+1. **Clone and install**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/ministack.git
+   cd ministack/mobile && npm install
+   ```
+
+2. **Start the backend**
+   ```bash
+   cd backend/MiniStack.Api
+   dotnet run
+   # API + Scalar UI: http://localhost:5001/scalar/v1
+   ```
+
+3. **Set your LAN IP in `.env`**
+   ```bash
+   # macOS
+   ipconfig getifaddr en0
+   # Edit mobile/.env → EXPO_PUBLIC_API_BASE_URL=http://<your-ip>:5001
+   ```
+
+4. **Start the mobile app**
+   ```bash
+   cd mobile
+   npx expo start
+   ```
+
+5. **Register an account** in the app — the Notes demo should sync end-to-end.
+
+---
+
 ## Prerequisites
 
 - Node 20+ and npm
