@@ -58,7 +58,8 @@ builder.Services.AddOpenApi(options =>
         document.Info ??= new();
         document.Info.Title = "MiniStack API";
         document.Components ??= new OpenApiComponents();
-        document.Components.SecuritySchemes!["Bearer"] = new OpenApiSecurityScheme
+        document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
+        document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
         {
             Name        = "Authorization",
             Type        = SecuritySchemeType.Http,

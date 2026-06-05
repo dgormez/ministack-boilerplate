@@ -2,7 +2,7 @@ name: Deploy backend to Azure
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths: [backend/**]
   workflow_dispatch:
 
