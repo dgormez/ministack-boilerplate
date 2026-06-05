@@ -1,0 +1,19 @@
+# Mobile
+mobile/node_modules/
+mobile/.expo/
+mobile/dist/
+mobile/.env
+mobile/ios/
+mobile/android/
+mobile/*.log
+
+# Backend
+backend/**/bin/
+backend/**/obj/
+backend/**/*.user
+*.nupkg
+
+# General
+.DS_Store
+*.log
+.env
