@@ -12,7 +12,7 @@ import { Note, AuthResponse, SyncResponse } from "../types";
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const REFRESH_TOKEN_KEY = "twinstack_refresh_token";
+const REFRESH_TOKEN_KEY = "ministack_refresh_token";
 
 let _baseUrl     = "";
 let _accessToken = "";

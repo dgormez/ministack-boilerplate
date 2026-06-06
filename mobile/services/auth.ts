@@ -18,7 +18,7 @@ import type { AuthResponse } from "../types";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function applyAuthResponse(baseUrl: string, data: AuthResponse) {
+export function applyAuthResponse(baseUrl: string, data: AuthResponse) {
   configureApi(baseUrl);
   setAccessToken(data.accessToken);
 

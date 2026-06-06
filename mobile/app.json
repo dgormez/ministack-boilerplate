@@ -40,7 +40,8 @@
           "organization": "YOUR_SENTRY_ORG",
           "project": "YOUR_SENTRY_PROJECT"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

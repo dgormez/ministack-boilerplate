@@ -5,6 +5,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { login } from "../../services/auth";
+import { useGoogleSignIn } from "../../services/googleAuth";
 
 const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_BASE_URL ?? "https://your-api.azurewebsites.net";
@@ -16,6 +17,8 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState("");
+
+  const googleSignIn = useGoogleSignIn(API_BASE_URL);
 
   const handleLogin = async () => {
     setError("");
@@ -48,9 +51,9 @@ export default function LoginScreen() {
           </Text>
 
           {/* Error banner */}
-          {!!error && (
+          {!!(error || googleSignIn.error) && (
             <View className="bg-red-900/50 border border-red-500 rounded-xl px-4 py-3 mb-5">
-              <Text className="text-red-300 text-sm">{error}</Text>
+              <Text className="text-red-300 text-sm">{error || googleSignIn.error}</Text>
             </View>
           )}
 
@@ -89,6 +92,25 @@ export default function LoginScreen() {
             {loading
               ? <ActivityIndicator color="#fff" />
               : <Text className="text-white text-lg font-bold">Sign in</Text>
+            }
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View className="flex-row items-center my-5">
+            <View className="flex-1 h-px bg-gray-700" />
+            <Text className="text-gray-500 text-sm mx-3">or</Text>
+            <View className="flex-1 h-px bg-gray-700" />
+          </View>
+
+          {/* Google sign-in */}
+          <TouchableOpacity
+            onPress={googleSignIn.signIn}
+            disabled={!googleSignIn.ready || googleSignIn.loading || loading}
+            className="flex-row items-center justify-center bg-white rounded-2xl py-4"
+          >
+            {googleSignIn.loading
+              ? <ActivityIndicator color="#111827" />
+              : <Text className="text-gray-900 text-base font-semibold">Continue with Google</Text>
             }
           </TouchableOpacity>
 
