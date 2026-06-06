@@ -12,8 +12,12 @@ using MiniStack.Api.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // ── Database ──────────────────────────────────────────────────────────────────
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Skip Npgsql registration in Testing — integration tests inject InMemory via WebApplicationFactory.
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
 
 // ── JWT Auth ──────────────────────────────────────────────────────────────────
 var jwtSecret = builder.Configuration["Jwt:Secret"]
@@ -114,3 +118,5 @@ app.MapAuthEndpoints();
 app.MapNoteEndpoints();
 
 app.Run();
+
+public partial class Program { }
