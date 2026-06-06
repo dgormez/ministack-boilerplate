@@ -11,6 +11,7 @@ mobile/*.log
 backend/**/bin/
 backend/**/obj/
 backend/**/*.user
+backend/**/appsettings.Development.json
 *.nupkg
 
 # General
