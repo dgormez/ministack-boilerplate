@@ -4,6 +4,8 @@ A production-ready monorepo starter for shipping React Native apps backed by a .
 
 **Stack:** Expo SDK 54 · NativeWind v4 · Zustand · expo-sqlite · ASP.NET Core 10 Minimal API · EF Core · Supabase PostgreSQL · Azure App Service · EAS Build
 
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-dgormez-FFDD00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/dgormez)
+
 ---
 
 ## What's included
