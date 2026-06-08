@@ -8,14 +8,17 @@ import Toast from "react-native-toast-message";
 import { createNote } from "../../services/api";
 import { saveNotesLocally } from "../../services/localDb";
 import { useStore } from "../../store/useStore";
+import { useColors } from "../../hooks/useColors";
+import { ScreenContainer } from "../../components/ScreenContainer";
 
 export default function AddNoteScreen() {
   const router = useRouter();
   const { addNote } = useStore();
+  const colors = useColors();
 
-  const [title,   setTitle]   = useState("");
-  const [body,    setBody]    = useState("");
-  const [saving,  setSaving]  = useState(false);
+  const [title,  setTitle]  = useState("");
+  const [body,   setBody]   = useState("");
+  const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
     const trimmedTitle = title.trim();
@@ -35,7 +38,8 @@ export default function AddNoteScreen() {
   };
 
   return (
-    <KeyboardAvoidingView behavior="padding" className="flex-1 bg-gray-900">
+    <KeyboardAvoidingView behavior="padding" className="flex-1 bg-white dark:bg-gray-900">
+      <ScreenContainer>
       <View className="flex-1 px-5 pt-4">
 
         {/* Title */}
@@ -43,10 +47,10 @@ export default function AddNoteScreen() {
           value={title}
           onChangeText={setTitle}
           placeholder="Title"
-          placeholderTextColor="#6b7280"
+          placeholderTextColor={colors.placeholder}
           autoFocus
           returnKeyType="next"
-          className="text-white text-2xl font-bold mb-4 py-2"
+          className="text-gray-900 dark:text-white text-2xl font-bold mb-4 py-2"
           style={{ fontSize: 24 }}
         />
 
@@ -55,10 +59,10 @@ export default function AddNoteScreen() {
           value={body}
           onChangeText={setBody}
           placeholder="Start writing…"
-          placeholderTextColor="#6b7280"
+          placeholderTextColor={colors.placeholder}
           multiline
           textAlignVertical="top"
-          className="text-gray-300 text-base flex-1 py-2"
+          className="text-gray-700 dark:text-gray-300 text-base flex-1 py-2"
           style={{ fontSize: 16, lineHeight: 24 }}
         />
 
@@ -66,7 +70,7 @@ export default function AddNoteScreen() {
         <TouchableOpacity
           onPress={handleSave}
           disabled={!title.trim() || saving}
-          className={`rounded-2xl py-4 items-center mb-6 ${title.trim() && !saving ? "bg-blue-600" : "bg-gray-600"}`}
+          className={`rounded-2xl py-4 items-center mb-6 ${title.trim() && !saving ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"}`}
         >
           {saving
             ? <ActivityIndicator color="#fff" />
@@ -75,6 +79,7 @@ export default function AddNoteScreen() {
         </TouchableOpacity>
 
       </View>
+      </ScreenContainer>
     </KeyboardAvoidingView>
   );
 }

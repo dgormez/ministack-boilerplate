@@ -1,30 +1,104 @@
 import { Tabs } from "expo-router";
-import { Text } from "react-native";
+import { Text, View, TouchableOpacity } from "react-native";
+import { usePathname, useRouter } from "expo-router";
+import { useColors } from "../../hooks/useColors";
+import { useBreakpoint } from "../../hooks/useBreakpoint";
+
+const NAV_ITEMS = [
+  { name: "index",    label: "Notes",    icon: "📝", href: "/(tabs)"          },
+  { name: "settings", label: "Settings", icon: "⚙️", href: "/(tabs)/settings" },
+] as const;
+
+function Sidebar() {
+  const pathname   = usePathname();
+  const router     = useRouter();
+  const colors     = useColors();
+  const isSettings = pathname.includes("settings");
+
+  return (
+    <View style={{
+      width: 220,
+      backgroundColor: colors.tabBar,
+      borderRightWidth: 1,
+      borderRightColor: colors.tabBorder,
+      paddingTop: 60,
+      paddingHorizontal: 12,
+    }}>
+      <Text style={{
+        color: "#9ca3af",
+        fontSize: 11,
+        fontWeight: "600",
+        textTransform: "uppercase",
+        letterSpacing: 1,
+        paddingHorizontal: 12,
+        marginBottom: 12,
+      }}>
+        MiniStack
+      </Text>
+
+      {NAV_ITEMS.map((item) => {
+        const active = item.name === "settings" ? isSettings : !isSettings;
+        return (
+          <TouchableOpacity
+            key={item.name}
+            onPress={() => router.push(item.href)}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 12,
+              paddingVertical: 12,
+              borderRadius: 10,
+              marginBottom: 4,
+              backgroundColor: active ? "rgba(59, 130, 246, 0.12)" : "transparent",
+            }}
+          >
+            <Text style={{ fontSize: 18, marginRight: 10 }}>{item.icon}</Text>
+            <Text style={{
+              color: active ? "#3b82f6" : "#6b7280",
+              fontWeight: active ? "600" : "normal",
+              fontSize: 15,
+            }}>
+              {item.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
 
 export default function TabsLayout() {
+  const { isWide } = useBreakpoint();
+  const colors     = useColors();
+
   return (
-    <Tabs
-      screenOptions={{
-        headerShown:      false,
-        tabBarStyle:      { backgroundColor: "#1f2937", borderTopColor: "#374151" },
-        tabBarActiveTintColor:   "#3b82f6",
-        tabBarInactiveTintColor: "#6b7280",
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title:    "Notes",
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>📝</Text>,
+    <View style={{ flex: 1, flexDirection: isWide ? "row" : "column" }}>
+      {isWide && <Sidebar />}
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: isWide
+            ? { display: "none" }
+            : { backgroundColor: colors.tabBar, borderTopColor: colors.tabBorder },
+          tabBarActiveTintColor:   "#3b82f6",
+          tabBarInactiveTintColor: "#6b7280",
         }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title:    "Settings",
-          tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>⚙️</Text>,
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title:      "Notes",
+            tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>📝</Text>,
+          }}
+        />
+        <Tabs.Screen
+          name="settings"
+          options={{
+            title:      "Settings",
+            tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>⚙️</Text>,
+          }}
+        />
+      </Tabs>
+    </View>
   );
 }

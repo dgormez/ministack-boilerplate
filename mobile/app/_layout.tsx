@@ -6,11 +6,13 @@ import { StatusBar } from "expo-status-bar";
 import { View, ActivityIndicator, useColorScheme } from "react-native";
 import Toast from "react-native-toast-message";
 
-import { initDb, getLocalNotes, getLastSyncTime } from "../services/localDb";
+import { initDb, getLocalNotes, getLastSyncTime, getConfigValue, setConfigValue } from "../services/localDb";
 import { configureApi } from "../services/api";
 import { tryRestoreSession } from "../services/auth";
+import { registerForPushNotifications } from "../services/notifications";
 import { useStore } from "../store/useStore";
 import { useSync } from "../hooks/useSync";
+import { useColors } from "../hooks/useColors";
 
 // ── Sentry crash reporting ────────────────────────────────────────────────────
 // 1. Create a free project at https://sentry.io → React Native
@@ -30,17 +32,26 @@ const API_BASE_URL =
 
 function RootLayout() {
   const colorScheme = useColorScheme();
-  const [isReady, setIsReady] = useState(false);
+  const [isReady,     setIsReady]     = useState(false);
+  const [isOnboarded, setIsOnboarded] = useState(false);
 
   const { auth, setNotes, setLastSyncAt } = useStore();
   const { sync } = useSync();
+  const colors = useColors();
 
   // One-time bootstrap: restore session, then mark ready.
   useEffect(() => {
     async function bootstrap() {
       initDb();
       configureApi(API_BASE_URL);
-      await tryRestoreSession(API_BASE_URL);
+
+      const sessionRestored = await tryRestoreSession(API_BASE_URL);
+      const onboarded = getConfigValue("onboardingComplete") === "true";
+
+      // Existing users who had no onboarding should skip it
+      if (sessionRestored && !onboarded) setConfigValue("onboardingComplete", "true");
+
+      setIsOnboarded(sessionRestored || onboarded);
       setIsReady(true);
     }
     bootstrap().catch(console.error);
@@ -55,12 +66,13 @@ function RootLayout() {
     const lastSync = getLastSyncTime();
     if (lastSync) setLastSyncAt(lastSync);
     sync();
+    registerForPushNotifications().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady, auth?.userId]);
 
   if (!isReady) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#111827", alignItems: "center", justifyContent: "center" }}>
+      <View style={{ flex: 1, backgroundColor: colors.header, alignItems: "center", justifyContent: "center" }}>
         <ActivityIndicator size="large" color="#3b82f6" />
       </View>
     );
@@ -70,32 +82,34 @@ function RootLayout() {
     <>
       <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)"  options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)"  options={{ headerShown: false }} />
+        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)"     options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)"     options={{ headerShown: false }} />
         <Stack.Screen
           name="note/add"
           options={{
-            headerShown:  true,
-            title:        "New Note",
-            presentation: "modal",
-            headerStyle:  { backgroundColor: "#1f2937" },
-            headerTintColor: "#fff",
+            headerShown:     true,
+            title:           "New Note",
+            presentation:    "modal",
+            headerStyle:     { backgroundColor: colors.header },
+            headerTintColor: colors.headerText,
           }}
         />
         <Stack.Screen
           name="note/[id]"
           options={{
-            headerShown:  true,
-            title:        "Edit Note",
-            presentation: "modal",
-            headerStyle:  { backgroundColor: "#1f2937" },
-            headerTintColor: "#fff",
+            headerShown:     true,
+            title:           "Edit Note",
+            presentation:    "modal",
+            headerStyle:     { backgroundColor: colors.header },
+            headerTintColor: colors.headerText,
           }}
         />
       </Stack>
 
-      {/* Redirect to login when not authenticated */}
-      {!auth && <Redirect href="/(auth)/login" />}
+      {/* Routing: onboarding → auth → app */}
+      {!auth && !isOnboarded && <Redirect href="/onboarding" />}
+      {!auth &&  isOnboarded && <Redirect href="/(auth)/login" />}
 
       <Toast />
     </>

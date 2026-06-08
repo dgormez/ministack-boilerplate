@@ -9,7 +9,7 @@ module.exports = {
     name: "MiniStack",
     slug: "ministack",
     version: "1.0.0",
-    orientation: "portrait",
+    orientation: "default",
     icon: "./assets/images/icon.png",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
@@ -19,8 +19,11 @@ module.exports = {
       backgroundColor: "#111827",
     },
     ios: {
-      supportsTablet: false,
+      supportsTablet: true,
       bundleIdentifier: "com.yourcompany.ministack",
+      entitlements: {
+        "com.apple.developer.applesignin": ["Default"],
+      },
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
         // Allow plain HTTP to local dev server (remove before production)
@@ -44,6 +47,15 @@ module.exports = {
       "expo-router",
       "expo-sqlite",
       "expo-secure-store",
+      "expo-apple-authentication",
+      [
+        "expo-notifications",
+        {
+          icon: "./assets/images/icon.png",
+          color: "#2563eb",
+          sounds: [],
+        },
+      ],
       [
         "@sentry/react-native/expo",
         {
@@ -54,6 +66,10 @@ module.exports = {
       ],
       "expo-web-browser",
     ],
+    web: {
+      bundler: "metro",
+      output:  "static",
+    },
     experiments: {
       typedRoutes: true,
     },

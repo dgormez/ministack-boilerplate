@@ -26,6 +26,8 @@ var jwtSecret = builder.Configuration["Jwt:Secret"]
     ?? throw new InvalidOperationException("Jwt:Secret is not configured.");
 
 builder.Services.AddSingleton<JwtService>();
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<PushNotificationService>();
 builder.Services.AddHttpClient();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -157,6 +159,7 @@ app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = Dat
 // ── Feature endpoints ─────────────────────────────────────────────────────────
 app.MapAuthEndpoints();
 app.MapNoteEndpoints();
+app.MapNotificationEndpoints();
 
 app.Run();
 

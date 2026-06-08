@@ -112,6 +112,11 @@ export const updateNote = (id: string, title: string, body?: string): Promise<No
 export const deleteNote = (id: string): Promise<void> =>
   request("DELETE", `/api/notes/${id}`);
 
+// ── Notifications ─────────────────────────────────────────────────────────────
+
+export const registerPushToken = (token: string): Promise<void> =>
+  request("POST", "/api/notifications/push-token", { token });
+
 // ── Health ────────────────────────────────────────────────────────────────────
 
 export const checkHealth = async (): Promise<boolean> => {

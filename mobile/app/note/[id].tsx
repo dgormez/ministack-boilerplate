@@ -8,21 +8,24 @@ import Toast from "react-native-toast-message";
 import { updateNote as apiUpdateNote, deleteNote as apiDeleteNote } from "../../services/api";
 import { saveNotesLocally, deleteLocalNote } from "../../services/localDb";
 import { useStore } from "../../store/useStore";
+import { useColors } from "../../hooks/useColors";
+import { ScreenContainer } from "../../components/ScreenContainer";
 
 export default function EditNoteScreen() {
   const router = useRouter();
   const { id }  = useLocalSearchParams<{ id: string }>();
   const { notes, updateNote, removeNote } = useStore();
+  const colors = useColors();
 
   const note = notes.find((n) => n.id === id);
 
-  const [title,   setTitle]   = useState(note?.title ?? "");
-  const [body,    setBody]    = useState(note?.body ?? "");
-  const [saving,  setSaving]  = useState(false);
+  const [title,    setTitle]    = useState(note?.title ?? "");
+  const [body,     setBody]     = useState(note?.body  ?? "");
+  const [saving,   setSaving]   = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    if (!note) router.back(); // note was deleted elsewhere
+    if (!note) router.back();
   }, [note]);
 
   const handleSave = async () => {
@@ -66,7 +69,8 @@ export default function EditNoteScreen() {
   };
 
   return (
-    <KeyboardAvoidingView behavior="padding" className="flex-1 bg-gray-900">
+    <KeyboardAvoidingView behavior="padding" className="flex-1 bg-white dark:bg-gray-900">
+      <ScreenContainer>
       <View className="flex-1 px-5 pt-4">
 
         {/* Title */}
@@ -74,9 +78,9 @@ export default function EditNoteScreen() {
           value={title}
           onChangeText={setTitle}
           placeholder="Title"
-          placeholderTextColor="#6b7280"
+          placeholderTextColor={colors.placeholder}
           returnKeyType="next"
-          className="text-white text-2xl font-bold mb-4 py-2"
+          className="text-gray-900 dark:text-white text-2xl font-bold mb-4 py-2"
           style={{ fontSize: 24 }}
         />
 
@@ -85,10 +89,10 @@ export default function EditNoteScreen() {
           value={body}
           onChangeText={setBody}
           placeholder="Write something…"
-          placeholderTextColor="#6b7280"
+          placeholderTextColor={colors.placeholder}
           multiline
           textAlignVertical="top"
-          className="text-gray-300 text-base flex-1 py-2"
+          className="text-gray-700 dark:text-gray-300 text-base flex-1 py-2"
           style={{ fontSize: 16, lineHeight: 24 }}
         />
 
@@ -97,18 +101,18 @@ export default function EditNoteScreen() {
           <TouchableOpacity
             onPress={handleDelete}
             disabled={deleting || saving}
-            className="flex-1 bg-gray-700 rounded-2xl py-4 items-center"
+            className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-2xl py-4 items-center"
           >
             {deleting
               ? <ActivityIndicator color="#f87171" />
-              : <Text className="text-red-400 font-bold text-base">Delete</Text>
+              : <Text className="text-red-500 dark:text-red-400 font-bold text-base">Delete</Text>
             }
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={handleSave}
             disabled={!title.trim() || saving || deleting}
-            className={`flex-2 rounded-2xl py-4 items-center flex-1 ${title.trim() && !saving ? "bg-blue-600" : "bg-gray-600"}`}
+            className={`flex-1 rounded-2xl py-4 items-center ${title.trim() && !saving ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"}`}
           >
             {saving
               ? <ActivityIndicator color="#fff" />
@@ -118,6 +122,7 @@ export default function EditNoteScreen() {
         </View>
 
       </View>
+      </ScreenContainer>
     </KeyboardAvoidingView>
   );
 }

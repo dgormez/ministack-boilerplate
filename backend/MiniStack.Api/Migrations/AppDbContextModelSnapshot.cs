@@ -68,11 +68,23 @@ namespace MiniStack.Api.Migrations
                         .HasMaxLength(254)
                         .HasColumnType("character varying(254)");
 
+                    b.Property<string>("AppleId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ExpoPushToken")
+                        .HasColumnType("text");
+
                     b.Property<string>("GoogleId")
                         .HasColumnType("text");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("PasswordResetExpiry")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PasswordResetToken")
                         .HasColumnType("text");
 
                     b.Property<string>("RefreshToken")

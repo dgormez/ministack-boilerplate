@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"from PIL import Image; print\\('Pillow OK'\\)\")",
+      "Bash(python3 -c ' *)",
+      "Bash(git commit -m ' *)",
+      "Bash(ipconfig getifaddr *)",
+      "Bash(npm install *)",
+      "Bash(node -e ' *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('RN:', d['version']\\)\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('Expo:', d['version']\\)\")",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\('main:', p.get\\('main'\\)\\); print\\('module:', p.get\\('module'\\)\\); print\\('react-native:', p.get\\('react-native'\\)\\); print\\('source:', p.get\\('source'\\)\\)\")",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\('metro version:', p.get\\('version'\\)\\)\")",
+      "Bash(awk '{print $2}')",
+      "Bash(curl -s -w '\\\\nHTTP %{http_code}' -X POST http://localhost:5000/api/auth/register -H 'Content-Type: application/json' -d '{\"email\":\"test@example.com\",\"password\":\"password123\"}')"
+    ],
+    "additionalDirectories": [
+      "/Users/dgormez/.claude"
+    ]
+  }
+}

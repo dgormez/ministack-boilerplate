@@ -89,7 +89,7 @@ export function useGoogleSignIn(baseUrl: string) {
   }, [response]);
 
   return {
-    signIn:      () => { setError(""); promptAsync({ useProxy: isExpoGo }); },
+    signIn:      () => { setError(""); promptAsync(); },
     clearError:  () => setError(""),
     loading,
     error,
