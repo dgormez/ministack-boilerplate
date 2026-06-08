@@ -100,6 +100,10 @@ jobs:
             Jwt__Audience=MiniStackApp
             Jwt__AccessTokenExpiryMinutes=15
             Jwt__RefreshTokenExpiryDays=30
+            Google__AllowedClientIds__0=719484033277-dc4fv8f1a9p1n7hc0sqobmvatauqh65c.apps.googleusercontent.com
+            Google__AllowedClientIds__1=719484033277-doi307nphggq2272ruucvas6gauc0b8r.apps.googleusercontent.com
+            Google__AllowedClientIds__2=719484033277-ued1jvtuj5kibbgasuqljj297e793pg4.apps.googleusercontent.com
+            Google__AllowedClientIds__3=719484033277-5uhbocdvfi2r6dh4nun2cnn5gvloirjc.apps.googleusercontent.com
 
       - name: Print service URL
         run: echo "Deployed to ${{ steps.deploy.outputs.url }}"

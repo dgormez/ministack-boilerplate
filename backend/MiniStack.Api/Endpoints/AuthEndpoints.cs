@@ -13,7 +13,7 @@ public static class AuthEndpoints
 {
     public static void MapAuthEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/api/auth").WithTags("Auth");
+        var group = app.MapGroup("/api/auth").WithTags("Auth").RequireRateLimiting("auth");
 
         // ── POST /api/auth/register ──────────────────────────────────────────
         group.MapPost("/register", async (RegisterRequest req, AppDbContext db, JwtService jwt) =>

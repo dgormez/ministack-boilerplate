@@ -35,32 +35,28 @@ function RootLayout() {
   const { auth, setNotes, setLastSyncAt } = useStore();
   const { sync } = useSync();
 
+  // One-time bootstrap: restore session, then mark ready.
   useEffect(() => {
     async function bootstrap() {
       initDb();
       configureApi(API_BASE_URL);
-
-      const restored = await tryRestoreSession(API_BASE_URL);
-
-      if (restored) {
-        // Load local SQLite data immediately — no spinner for the user
-        const userId = useStore.getState().auth?.userId;
-        if (userId) {
-          setNotes(getLocalNotes(userId));
-          const lastSync = getLastSyncTime();
-          if (lastSync) setLastSyncAt(lastSync);
-        }
-
-        setIsReady(true);
-        sync(); // background sync — won't block the UI
-      } else {
-        setIsReady(true); // will redirect to /(auth)/login via the Redirect below
-      }
+      await tryRestoreSession(API_BASE_URL);
+      setIsReady(true);
     }
-
     bootstrap().catch(console.error);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Load notes from SQLite + background sync whenever the logged-in user changes.
+  // Runs on initial login, session restore, and after logout → login.
+  useEffect(() => {
+    if (!isReady || !auth) return;
+    setNotes(getLocalNotes(auth.userId));
+    const lastSync = getLastSyncTime();
+    if (lastSync) setLastSyncAt(lastSync);
+    sync();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isReady, auth?.userId]);
 
   if (!isReady) {
     return (

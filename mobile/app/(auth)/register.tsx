@@ -6,6 +6,7 @@ import {
 import { useRouter } from "expo-router";
 import { register } from "../../services/auth";
 import { useGoogleSignIn } from "../../services/googleAuth";
+import { ThemedModal } from "../../components/ThemedModal";
 
 const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_BASE_URL ?? "https://your-api.azurewebsites.net";
@@ -65,12 +66,18 @@ export default function RegisterScreen() {
             Create your account
           </Text>
 
-          {/* Error banner */}
-          {!!(error || googleSignIn.error) && (
-            <View className="bg-red-900/50 border border-red-500 rounded-xl px-4 py-3 mb-5">
-              <Text className="text-red-300 text-sm">{error || googleSignIn.error}</Text>
-            </View>
-          )}
+          <ThemedModal
+            config={
+              (error || googleSignIn.error)
+                ? {
+                    title:   "Registration failed",
+                    message: error || googleSignIn.error,
+                    buttons: [{ label: "OK", style: "default", onPress: () => { setError(""); googleSignIn.clearError(); } }],
+                  }
+                : null
+            }
+            onDismiss={() => { setError(""); googleSignIn.clearError(); }}
+          />
 
           {/* Email */}
           <Text className="text-gray-300 text-sm font-medium mb-1">Email</Text>
@@ -137,7 +144,11 @@ export default function RegisterScreen() {
           >
             {googleSignIn.loading
               ? <ActivityIndicator color="#111827" />
-              : <Text className="text-gray-900 text-base font-semibold">Continue with Google</Text>
+              : (
+                <Text className="text-gray-900 text-base font-semibold">
+                  Sign up with Google
+                </Text>
+              )
             }
           </TouchableOpacity>
 
