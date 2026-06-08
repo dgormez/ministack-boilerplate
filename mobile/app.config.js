@@ -20,7 +20,7 @@ module.exports = {
     },
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.yourcompany.ministack",
+      bundleIdentifier: "com.dgit.ministack",
       entitlements: {
         "com.apple.developer.applesignin": ["Default"],
       },
