@@ -49,12 +49,26 @@ builder.Services.AddAuthorization();
 // ── Rate limiting ─────────────────────────────────────────────────────────────
 builder.Services.AddRateLimiter(options =>
 {
-    options.AddPolicy("auth", httpContext =>
+    // Strict: login + register — brute-force targets
+    options.AddPolicy("auth-strict", httpContext =>
         RateLimitPartition.GetSlidingWindowLimiter(
             partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "anon",
             factory: _ => new SlidingWindowRateLimiterOptions
             {
                 PermitLimit          = 5,
+                Window               = TimeSpan.FromMinutes(15),
+                SegmentsPerWindow    = 3,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit           = 0,
+            }));
+
+    // Generous: Google OAuth — not a brute-force risk, needs room for normal flows
+    options.AddPolicy("auth-oauth", httpContext =>
+        RateLimitPartition.GetSlidingWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "anon",
+            factory: _ => new SlidingWindowRateLimiterOptions
+            {
+                PermitLimit          = 30,
                 Window               = TimeSpan.FromMinutes(15),
                 SegmentsPerWindow    = 3,
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,

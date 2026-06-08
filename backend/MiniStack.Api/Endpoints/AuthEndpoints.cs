@@ -13,7 +13,7 @@ public static class AuthEndpoints
 {
     public static void MapAuthEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/api/auth").WithTags("Auth").RequireRateLimiting("auth");
+        var group = app.MapGroup("/api/auth").WithTags("Auth");
 
         // ── POST /api/auth/register ──────────────────────────────────────────
         group.MapPost("/register", async (RegisterRequest req, AppDbContext db, JwtService jwt) =>
@@ -38,7 +38,7 @@ public static class AuthEndpoints
                 jwt.GenerateAccessToken(user),
                 refreshToken,
                 new UserDto(user.Id, user.Email)));
-        });
+        }).RequireRateLimiting("auth-strict");
 
         // ── POST /api/auth/login ─────────────────────────────────────────────
         group.MapPost("/login", async (LoginRequest req, AppDbContext db, JwtService jwt) =>
@@ -57,7 +57,7 @@ public static class AuthEndpoints
                 jwt.GenerateAccessToken(user),
                 refreshToken,
                 new UserDto(user.Id, user.Email)));
-        });
+        }).RequireRateLimiting("auth-strict");
 
         // ── POST /api/auth/refresh ───────────────────────────────────────────
         group.MapPost("/refresh", async (RefreshRequest req, AppDbContext db, JwtService jwt) =>
@@ -123,7 +123,7 @@ public static class AuthEndpoints
                 jwt.GenerateAccessToken(user),
                 refreshToken,
                 new UserDto(user.Id, user.Email)));
-        });
+        }).RequireRateLimiting("auth-oauth");
 
         // ── POST /api/auth/logout ────────────────────────────────────────────
         group.MapPost("/logout", async (HttpContext context, AppDbContext db) =>
