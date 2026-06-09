@@ -28,9 +28,12 @@ module.exports = {
         ITSAppUsesNonExemptEncryption: false,
         // Allow plain HTTP to local dev server (remove before production)
         NSAppTransportSecurity: { NSAllowsArbitraryLoads: true },
-        ...(iosReverseScheme
-          ? { CFBundleURLTypes: [{ CFBundleURLSchemes: [iosReverseScheme] }] }
-          : {}),
+        CFBundleURLTypes: [
+          // Deep links: ministack://  (used by expo-router + password reset)
+          { CFBundleURLSchemes: ["ministack"] },
+          // Google OAuth callback scheme
+          ...(iosReverseScheme ? [{ CFBundleURLSchemes: [iosReverseScheme] }] : []),
+        ],
       },
     },
     android: {
