@@ -69,6 +69,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.x"
+
+      - name: Run database migrations
+        run: |
+          dotnet tool install --global dotnet-ef
+          dotnet ef database update --project backend/MiniStack.Api/MiniStack.Api.csproj
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING }}
+
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v2
         with:
