@@ -164,7 +164,7 @@ public static class AuthEndpoints
             AppleAuthRequest req, AppDbContext db, JwtService jwt,
             IHttpClientFactory httpClientFactory, IConfiguration config) =>
         {
-            var bundleId = config["Apple:BundleId"] ?? "com.yourcompany.ministack";
+            var bundleId = config["Apple:BundleId"] ?? "com.dgit.ministack";
             var (sub, tokenEmail) = await VerifyAppleTokenAsync(req.IdentityToken, bundleId, httpClientFactory);
             if (sub is null) return Results.Unauthorized();
 

@@ -14,13 +14,13 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.yourcompany.ministack",
+      "bundleIdentifier": "com.dgit.ministack",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.yourcompany.ministack",
+      "package": "com.dgit.ministack",
       "versionCode": 1,
       "usesCleartextTraffic": true,
       "softwareKeyboardLayoutMode": "pan",

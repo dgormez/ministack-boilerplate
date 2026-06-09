@@ -6,10 +6,10 @@ Replace every placeholder below before running `dotnet run` or `expo start`.
 
 ## `mobile/app.json`
 
-- [ ] `ios.bundleIdentifier` — `com.yourcompany.ministack` (×1)  
+- [ ] `ios.bundleIdentifier` — `com.dgit.ministack` (×1)  
   Your reverse-domain app ID, e.g. `com.acme.myapp`. Must match what you register in App Store Connect.
 
-- [ ] `android.package` — `com.yourcompany.ministack` (×1)  
+- [ ] `android.package` — `com.dgit.ministack` (×1)  
   Same reverse-domain ID used for your Google Play listing.
 
 - [ ] `plugins[@sentry/react-native/expo].organization` — `YOUR_SENTRY_ORG`  

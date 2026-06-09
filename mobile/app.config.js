@@ -37,7 +37,7 @@ module.exports = {
       },
     },
     android: {
-      package: "com.yourcompany.ministack",
+      package: "com.dgit.ministack",
       versionCode: 1,
       usesCleartextTraffic: true,
       softwareKeyboardLayoutMode: "pan",

@@ -19,7 +19,7 @@ const isExpoGo = Constants.appOwnership === "expo";
 // For Expo Go: use the auth.expo.io proxy.
 // For native builds (expo run:ios / run:android): Google requires the reverse
 // client ID scheme (com.googleusercontent.apps.XXXXX:/oauthredirect).
-// Google Cloud Console → iOS client → bundle ID com.yourcompany.ministack.
+// Google Cloud Console → iOS client → bundle ID com.dgit.ministack.
 const iosReverseScheme = IOS_CLIENT_ID
   ? `com.googleusercontent.apps.${IOS_CLIENT_ID.split(".apps.googleusercontent.com")[0]}`
   : "";
