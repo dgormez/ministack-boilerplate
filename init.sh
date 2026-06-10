@@ -2,47 +2,62 @@
 # ──────────────────────────────────────────────────────────────────────────────
 # init.sh — Rename MiniStack to your app across the entire repo.
 # Run once from the repo root after cloning:  bash init.sh
-# Override defaults via env vars:  APP_NAME=MyApp BUNDLE_ID=com.acme.myapp bash init.sh
 # ──────────────────────────────────────────────────────────────────────────────
 set -e
-
-# ── Defaults (override with env vars) ─────────────────────────────────────────
-
-APP_NAME="${APP_NAME:-MiniStackLight}"
-BUNDLE_ID="${BUNDLE_ID:-com.yourcompany.ministacklight}"
-
-# Derive lowercase slug from the last segment of the bundle ID
-APP_SLUG="${BUNDLE_ID##*.}"
 
 echo ""
 echo "MiniStack initializer"
 echo "──────────────────────────────────────────────"
 echo ""
+echo "This script renames every occurrence of 'MiniStack' and 'ministack'"
+echo "to your app name, and replaces the bundle ID placeholder."
+echo ""
+
+# ── Gather inputs ─────────────────────────────────────────────────────────────
+
+read -rp "App name in PascalCase (e.g. TaskMaster):     " APP_NAME
+read -rp "Bundle ID   (e.g. com.acme.taskmaster):       " BUNDLE_ID
+read -rp "Your GitHub username (for README clone URL):  " GH_USER
+
+# Derive lowercase slug from the last segment of the bundle ID
+APP_SLUG="${BUNDLE_ID##*.}"
+
+echo ""
 echo "  PascalCase : $APP_NAME"
 echo "  Slug       : $APP_SLUG"
 echo "  Bundle ID  : $BUNDLE_ID"
+echo "  GitHub URL : https://github.com/$GH_USER/${APP_SLUG}-boilerplate"
 echo ""
+read -rp "Looks good? Press y to continue: " CONFIRM
+[[ "$CONFIRM" != "y" ]] && echo "Aborted." && exit 0
+echo ""
+
+# ── File list (skip generated / binary directories) ───────────────────────────
+
+mapfile -t FILES < <(find . \
+  \( -path "*/node_modules" -o -path "*/bin" -o -path "*/obj" -o -path "*/.git" \) -prune \
+  -o -type f \( \
+    -name "*.json"       -o -name "*.ts"    -o -name "*.tsx"  \
+    -o -name "*.cs"      -o -name "*.csproj" -o -name "*.sln" \
+    -o -name "*.yml"     -o -name "*.yaml"  -o -name "*.md"   \
+    -o -name "*.js"      -o -name "*.sh"    -o -name "*.txt"  \
+    -o -name "Dockerfile"
+  \) -print)
 
 # ── Text replacements ─────────────────────────────────────────────────────────
 
 echo "Replacing names in source files..."
 
-find . \
-  '(' -path "*/node_modules" -o -path "*/bin" -o -path "*/obj" -o -path "*/.git" ')' -prune \
-  -o -type f '(' \
-    -name "*.json"       -o -name "*.ts"    -o -name "*.tsx"  \
-    -o -name "*.cs"      -o -name "*.csproj" -o -name "*.sln" \
-    -o -name "*.yml"     -o -name "*.yaml"  -o -name "*.md"   \
-    -o -name "*.js"      -o -name "*.sh"    -o -name "*.txt"  \
-    -o -name "Dockerfile" \
-  ')' -print | while IFS= read -r f; do
+for f in "${FILES[@]}"; do
+  # Skip package-lock.json — will be regenerated
   [[ "$f" == *"package-lock.json" ]] && continue
-  [[ "$f" == "./init.sh" ]] && continue
+
   perl -i -pe "
     s/MiniStack/$APP_NAME/g;
     s/ministack/$APP_SLUG/g;
     s/com\.yourcompany\.yourapp/$BUNDLE_ID/g;
     s/yourapp/$APP_SLUG/g;
+    s/YOUR_USERNAME/$GH_USER/g;
   " "$f"
 done
 
@@ -55,11 +70,7 @@ echo "Renaming .NET project directories..."
 
 for f in "backend/$APP_NAME.Api/MiniStack.Api.csproj" \
          "backend/$APP_NAME.Api.Tests/MiniStack.Api.Tests.csproj"; do
-  if [[ -f "$f" ]]; then
-    dir="$(dirname "$f")"
-    base="$(basename "$f")"
-    mv "$f" "$dir/${base/MiniStack/$APP_NAME}"
-  fi
+  [[ -f "$f" ]] && mv "$f" "${f/MiniStack/$APP_NAME}"
 done
 
 for f in *.sln; do
