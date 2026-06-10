@@ -1,57 +1,74 @@
-name: Deploy backend to Azure
+# ── Prerequisites (one-time Azure setup) ──────────────────────────────────────
+# See SETUP_CHECKLIST.md → Azure Deployment for step-by-step instructions.
+#
+# GitHub secrets required:
+#   AZURE_CLIENT_ID          → App registration / service principal client ID
+#   AZURE_TENANT_ID          → Azure AD tenant ID
+#   AZURE_SUBSCRIPTION_ID    → Azure subscription ID
+#   AZURE_RESOURCE_GROUP     → Resource group containing your Container App
+#   AZURE_CONTAINER_APP_NAME → Name of your Container App
+#   ACR_LOGIN_SERVER         → e.g. ministackregistry.azurecr.io
+#   DB_CONNECTION_STRING     → Full Supabase connection string
+#   JWT_SECRET               → Your JWT signing secret
+# ──────────────────────────────────────────────────────────────────────────────
+
+name: Deploy backend to Azure Container Apps
 
 on:
+  push:
+    branches: [master]
+    paths: [backend/**]
   workflow_dispatch:
 
+env:
+  IMAGE: ${{ secrets.ACR_LOGIN_SERVER }}/ministack/api
+
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up .NET 10
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "10.x"
-
-      - name: Build
-        run: dotnet build backend/MiniStack.Api/MiniStack.Api.csproj --configuration Release
-
-      - name: Publish
-        run: dotnet publish backend/MiniStack.Api/MiniStack.Api.csproj -c Release -o ${{ env.DOTNET_ROOT }}/app
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dotnet-app
-          path: ${{ env.DOTNET_ROOT }}/app
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      id-token: write
-      contents: read
-
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dotnet-app
-
-      - name: Login to Azure
+      - name: Log in to Azure
         uses: azure/login@v2
         with:
           client-id:       ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id:       ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy to Azure App Service
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name:  ${{ secrets.AZURE_APP_NAME }}   # e.g. twinstack-api
-          slot-name: Production
-          package:   .
+      - name: Log in to Azure Container Registry
+        run: az acr login --name ${{ secrets.ACR_LOGIN_SERVER }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build \
+            -t ${{ env.IMAGE }}:${{ github.sha }} \
+            -t ${{ env.IMAGE }}:latest \
+            ./backend/MiniStack.Api
+          docker push ${{ env.IMAGE }}:${{ github.sha }}
+          docker push ${{ env.IMAGE }}:latest
+
+      - name: Store secrets in Container App
+        run: |
+          az containerapp secret set \
+            --name ${{ secrets.AZURE_CONTAINER_APP_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --secrets \
+              "db-connection=${{ secrets.DB_CONNECTION_STRING }}" \
+              "jwt-secret=${{ secrets.JWT_SECRET }}"
+
+      - name: Deploy new image
+        run: |
+          az containerapp update \
+            --name ${{ secrets.AZURE_CONTAINER_APP_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --image ${{ env.IMAGE }}:${{ github.sha }} \
+            --set-env-vars \
+              "ConnectionStrings__DefaultConnection=secretref:db-connection" \
+              "Jwt__Secret=secretref:jwt-secret" \
+              "ASPNETCORE_ENVIRONMENT=Production"
