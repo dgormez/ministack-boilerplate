@@ -26,9 +26,8 @@ echo ""
 # ── Clean stale build artifacts and ghost directories ─────────────────────────
 
 echo "Cleaning stale build artifacts..."
-# Remove obj/bin from all backend project dirs (handles any leftover name from prior runs)
-find backend -maxdepth 2 -type d \( -name "obj" -o -name "bin" \) -exec rm -rf {} + 2>/dev/null || true
-# Remove any dirs that only contained build artifacts (now empty after the above)
+# Remove all bin/obj trees anywhere under backend (no depth limit) then drop empty dirs
+find backend -type d \( -name "bin" -o -name "obj" \) -prune -exec rm -rf {} + 2>/dev/null || true
 find backend -maxdepth 1 -mindepth 1 -type d -empty -delete 2>/dev/null || true
 
 # ── Text replacements ─────────────────────────────────────────────────────────
