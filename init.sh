@@ -25,10 +25,13 @@ echo ""
 
 # ── Clean stale build artifacts and ghost directories ─────────────────────────
 
+echo "Stopping dotnet build server to prevent background rebuilds..."
+dotnet build-server shutdown 2>/dev/null || true
+
 echo "Cleaning stale build artifacts..."
-rm -rf \
-  "backend/MiniStack.Api/bin"       "backend/MiniStack.Api/obj" \
-  "backend/MiniStack.Api.Tests/bin" "backend/MiniStack.Api.Tests/obj"
+find backend -type d \( -name "bin" -o -name "obj" \) | while IFS= read -r d; do
+  rm -rf "$d"
+done
 
 # ── Text replacements ─────────────────────────────────────────────────────────
 
@@ -70,9 +73,6 @@ _merge_or_move() {
 _merge_or_move "backend/MiniStack.Api"       "backend/$APP_NAME.Api"
 _merge_or_move "backend/MiniStack.Api.Tests" "backend/$APP_NAME.Api.Tests"
 
-# Belt-and-suspenders: force-remove the old dirs if anything survived
-[[ "$APP_NAME" != "MiniStack" ]] && rm -rf "backend/MiniStack.Api" "backend/MiniStack.Api.Tests"
-
 for f in "backend/$APP_NAME.Api/MiniStack.Api.csproj" \
          "backend/$APP_NAME.Api.Tests/MiniStack.Api.Tests.csproj"; do
   if [[ -f "$f" ]]; then
@@ -94,6 +94,12 @@ done
 
 echo "Regenerating mobile/package-lock.json..."
 (cd mobile && npm install --package-lock-only --silent 2>/dev/null)
+
+# ── Final cleanup ─────────────────────────────────────────────────────────────
+# Run after npm install to catch anything the IDE may have rebuilt during the script
+if [[ "$APP_NAME" != "MiniStack" ]]; then
+  rm -rf "backend/MiniStack.Api" "backend/MiniStack.Api.Tests"
+fi
 
 # ── Done ──────────────────────────────────────────────────────────────────────
 
