@@ -26,9 +26,9 @@ echo ""
 # ── Clean stale build artifacts and ghost directories ─────────────────────────
 
 echo "Cleaning stale build artifacts..."
-# Remove all bin/obj trees anywhere under backend (no depth limit) then drop empty dirs
-find backend -type d \( -name "bin" -o -name "obj" \) -prune -exec rm -rf {} + 2>/dev/null || true
-find backend -maxdepth 1 -mindepth 1 -type d -empty -delete 2>/dev/null || true
+rm -rf \
+  "backend/MiniStack.Api/bin"       "backend/MiniStack.Api/obj" \
+  "backend/MiniStack.Api.Tests/bin" "backend/MiniStack.Api.Tests/obj"
 
 # ── Text replacements ─────────────────────────────────────────────────────────
 
@@ -69,6 +69,9 @@ _merge_or_move() {
 
 _merge_or_move "backend/MiniStack.Api"       "backend/$APP_NAME.Api"
 _merge_or_move "backend/MiniStack.Api.Tests" "backend/$APP_NAME.Api.Tests"
+
+# Belt-and-suspenders: force-remove the old dirs if anything survived
+[[ "$APP_NAME" != "MiniStack" ]] && rm -rf "backend/MiniStack.Api" "backend/MiniStack.Api.Tests"
 
 for f in "backend/$APP_NAME.Api/MiniStack.Api.csproj" \
          "backend/$APP_NAME.Api.Tests/MiniStack.Api.Tests.csproj"; do
