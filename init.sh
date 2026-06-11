@@ -8,8 +8,8 @@ set -e
 
 # ── Defaults (override with env vars) ─────────────────────────────────────────
 
-APP_NAME="${APP_NAME:-MyFabulousApp}"
-BUNDLE_ID="${BUNDLE_ID:-com.dgo.myfabulousapp}"
+APP_NAME="${APP_NAME:-StackMini}"
+BUNDLE_ID="${BUNDLE_ID:-com.company.stackmini}"
 
 # Derive lowercase slug from the last segment of the bundle ID
 APP_SLUG="${BUNDLE_ID##*.}"
@@ -57,8 +57,19 @@ done
 
 echo "Renaming .NET project directories..."
 
-[[ -d "backend/MiniStack.Api"       && "backend/MiniStack.Api"       != "backend/$APP_NAME.Api"       ]] && mv "backend/MiniStack.Api"       "backend/$APP_NAME.Api"
-[[ -d "backend/MiniStack.Api.Tests" && "backend/MiniStack.Api.Tests" != "backend/$APP_NAME.Api.Tests" ]] && mv "backend/MiniStack.Api.Tests" "backend/$APP_NAME.Api.Tests"
+# If destination already exists (re-run), merge source into it rather than nesting it inside
+_merge_or_move() {
+  local src="$1" dst="$2"
+  [[ "$src" == "$dst" || ! -d "$src" ]] && return 0
+  if [[ -d "$dst" ]]; then
+    cp -a "$src/." "$dst/" && rm -rf "$src"
+  else
+    mv "$src" "$dst"
+  fi
+}
+
+_merge_or_move "backend/MiniStack.Api"       "backend/$APP_NAME.Api"
+_merge_or_move "backend/MiniStack.Api.Tests" "backend/$APP_NAME.Api.Tests"
 
 for f in "backend/$APP_NAME.Api/MiniStack.Api.csproj" \
          "backend/$APP_NAME.Api.Tests/MiniStack.Api.Tests.csproj"; do
